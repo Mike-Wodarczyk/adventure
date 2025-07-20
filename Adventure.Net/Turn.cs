@@ -16,26 +16,30 @@ namespace Adventure.Net
         public static void Initialize(GameState state)
         {
             gameState = state;
+            English.Initialize(state);
         }
 
         /// <summary>
         /// Main turn processor (converted from turn() in turn.c)
-        /// Basic implementation for now
         /// </summary>
         public static void ProcessTurn()
         {
             gameState.Turns++;
 
-            // For now, just describe the location and ask for input
+            // Describe the location and items
             Describe();
             DescribeItems();
 
-            // Get user input
+            // Get and parse user input
             Console.Write("> ");
             string input = Console.ReadLine() ?? "";
 
-            // Basic command processing
-            ProcessCommand(input.Trim().ToLower());
+            // Parse the input using English parser
+            if (!English.ParseInput(input))
+                return; // Parser handled error messages
+
+            // Process the parsed command
+            ProcessParsedCommand();
         }
 
         /// <summary>
@@ -81,45 +85,90 @@ namespace Adventure.Net
         }
 
         /// <summary>
-        /// Basic command processing
+        /// Process parsed command from English parser
         /// </summary>
-        private static void ProcessCommand(string input)
+        private static void ProcessParsedCommand()
         {
-            if (string.IsNullOrEmpty(input))
-                return;
-
-            // Very basic commands for testing
-            switch (input)
+            // Handle motion
+            if (gameState.Motion != 0)
             {
-                case "quit":
-                case "q":
+                ProcessMotion(gameState.Motion);
+                return;
+            }
+
+            // Handle verb commands
+            if (gameState.Verb != 0)
+            {
+                ProcessVerb(gameState.Verb, gameState.Object);
+                return;
+            }
+
+            // No recognized command
+            Console.WriteLine("I don't understand that.");
+        }
+
+        /// <summary>
+        /// Process motion commands
+        /// </summary>
+        private static void ProcessMotion(int motion)
+        {
+            Move(motion);
+        }
+
+        /// <summary>
+        /// Process verb commands
+        /// </summary>
+        private static void ProcessVerb(int verb, int obj)
+        {
+            switch (verb)
+            {
+                case QUIT:
                     gameState.SaveFlg = 1;
                     RSpeak(54); // "ok."
                     break;
-                case "look":
-                case "l":
+                case LOOK:
                     gameState.Visited[gameState.Loc] = 0; // Force long description
                     break;
-                case "n":
-                case "north":
-                    Move(1);
+                case INVENTORY:
+                    ShowInventory();
                     break;
-                case "s":
-                case "south":
-                    Move(2);
-                    break;
-                case "e":
-                case "east":
-                    Move(3);
-                    break;
-                case "w":
-                case "west":
-                    Move(4);
+                case SCORE:
+                    ShowScore();
                     break;
                 default:
-                    Console.WriteLine("I don't understand that command.");
+                    Console.WriteLine("I don't know how to do that.");
                     break;
             }
+        }
+
+        /// <summary>
+        /// Show player inventory
+        /// </summary>
+        private static void ShowInventory()
+        {
+            bool hasItems = false;
+            Console.Write("You are carrying:\n");
+            
+            for (int i = 1; i < gameState.Place.Length; i++)
+            {
+                if (gameState.Place[i] == gameState.Loc && i >= 50) // Objects >= 50 are portable
+                {
+                    Console.WriteLine($"  Item {i}"); // TODO: Add proper item names
+                    hasItems = true;
+                }
+            }
+            
+            if (!hasItems)
+                Console.WriteLine("  Nothing.");
+        }
+
+        /// <summary>
+        /// Show current score (basic implementation)
+        /// </summary>
+        private static void ShowScore()
+        {
+            Console.WriteLine($"You have scored 0 points out of a possible 350.");
+            Console.WriteLine($"Turn count: {gameState.Turns}");
         }
 
         /// <summary>
