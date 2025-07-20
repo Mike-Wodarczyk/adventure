@@ -1,3 +1,6 @@
+using System;
+using static Adventure.Net.AdventureConstants;
+
 namespace Adventure.Net
 {
     /// <summary>
@@ -5,6 +8,215 @@ namespace Adventure.Net
     /// </summary>
     public static class Turn
     {
-        // Placeholder - will be implemented later
+        private static GameState gameState;
+
+        /// <summary>
+        /// Initialize Turn processor with game state
+        /// </summary>
+        public static void Initialize(GameState state)
+        {
+            gameState = state;
+            English.Initialize(state);
+        }
+
+        /// <summary>
+        /// Main turn processor (converted from turn() in turn.c)
+        /// </summary>
+        public static void ProcessTurn()
+        {
+            gameState.Turns++;
+
+            // Describe the location and items
+            Describe();
+            DescribeItems();
+
+            // Get and parse user input
+            Console.Write("> ");
+            string input = Console.ReadLine() ?? "";
+
+            // Parse the input using English parser
+            if (!English.ParseInput(input))
+                return; // Parser handled error messages
+
+            // Process the parsed command
+            ProcessParsedCommand();
+        }
+
+        /// <summary>
+        /// Describe current location (converted from describe() in turn.c)
+        /// </summary>
+        private static void Describe()
+        {
+            // Basic implementation - check if dark, if visited, etc.
+            if (Dark())
+            {
+                RSpeak(16); // "It is now pitch dark. If you proceed you will likely fall into a pit."
+            }
+            else if (gameState.Visited[gameState.Loc] > 0)
+            {
+                // Short description
+                Console.Write(GameData.GetLocationDescription(gameState.Loc));
+            }
+            else
+            {
+                // Long description (first visit)
+                Console.Write(GameData.GetLocationDescription(gameState.Loc));
+                gameState.Visited[gameState.Loc] = 1;
+            }
+        }
+
+        /// <summary>
+        /// Describe visible items (converted from descitem() in turn.c)
+        /// Basic stub for now
+        /// </summary>
+        private static void DescribeItems()
+        {
+            // TODO: Implement item description
+        }
+
+        /// <summary>
+        /// Check if current location is dark (converted from dark() in turn.c)
+        /// </summary>
+        private static bool Dark()
+        {
+            // Basic implementation - location has no light and player has no lamp
+            return (gameState.Cond[gameState.Loc] & LIGHT) == 0 && 
+                   (gameState.Prop[LAMP] == 0 || gameState.Place[LAMP] != gameState.Loc);
+        }
+
+        /// <summary>
+        /// Process parsed command from English parser
+        /// </summary>
+        private static void ProcessParsedCommand()
+        {
+            // Handle motion
+            if (gameState.Motion != 0)
+            {
+                ProcessMotion(gameState.Motion);
+                return;
+            }
+
+            // Handle verb commands
+            if (gameState.Verb != 0)
+            {
+                ProcessVerb(gameState.Verb, gameState.Object);
+                return;
+            }
+
+            // No recognized command
+            Console.WriteLine("I don't understand that.");
+        }
+
+        /// <summary>
+        /// Process motion commands
+        /// </summary>
+        private static void ProcessMotion(int motion)
+        {
+            Move(motion);
+        }
+
+        /// <summary>
+        /// Process verb commands
+        /// </summary>
+        private static void ProcessVerb(int verb, int obj)
+        {
+            switch (verb)
+            {
+                case QUIT:
+                    gameState.SaveFlg = 1;
+                    RSpeak(54); // "ok."
+                    break;
+                case LOOK:
+                    gameState.Visited[gameState.Loc] = 0; // Force long description
+                    break;
+                case INVENTORY:
+                    ShowInventory();
+                    break;
+                case SCORE:
+                    ShowScore();
+                    break;
+                default:
+                    Console.WriteLine("I don't know how to do that.");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Show player inventory
+        /// </summary>
+        private static void ShowInventory()
+        {
+            bool hasItems = false;
+            Console.Write("You are carrying:\n");
+            
+            for (int i = 1; i < gameState.Place.Length; i++)
+            {
+                if (gameState.Place[i] == gameState.Loc && i >= 50) // Objects >= 50 are portable
+                {
+                    Console.WriteLine($"  Item {i}"); // TODO: Add proper item names
+                    hasItems = true;
+                }
+            }
+            
+            if (!hasItems)
+                Console.WriteLine("  Nothing.");
+        }
+
+        /// <summary>
+        /// Show current score (basic implementation)
+        /// </summary>
+        private static void ShowScore()
+        {
+            Console.WriteLine($"You have scored 0 points out of a possible 350.");
+            Console.WriteLine($"Turn count: {gameState.Turns}");
+        }
+
+        /// <summary>
+        /// Basic movement processing
+        /// </summary>
+        private static void Move(int direction)
+        {
+            // Very basic movement - just move between a few locations for testing
+            int newLoc = gameState.Loc;
+
+            // Hardcoded movement for basic testing
+            if (gameState.Loc == 1) // Starting location
+            {
+                if (direction == 1) newLoc = 2; // North to hill
+                else if (direction == 3) newLoc = 3; // East to building
+            }
+            else if (gameState.Loc == 2) // Hill
+            {
+                if (direction == 2) newLoc = 1; // South back to start
+            }
+            else if (gameState.Loc == 3) // Building
+            {
+                if (direction == 4) newLoc = 1; // West back to start
+                else if (direction == 2) newLoc = 8; // South to depression
+            }
+            else if (gameState.Loc == 8) // Depression
+            {
+                if (direction == 1) newLoc = 3; // North back to building
+            }
+
+            if (newLoc != gameState.Loc)
+            {
+                gameState.OldLoc = gameState.Loc;
+                gameState.Loc = newLoc;
+                gameState.NewLoc = newLoc;
+            }
+            else
+            {
+                Console.WriteLine("You can't go that way.");
+            }
+        }
+
+        /// <summary>
+        /// Print a game message (helper method)
+        /// </summary>
+        private static void RSpeak(int msg)
+        {
+            Console.Write(GameData.GetMessage(msg));
+        }
     }
 }
