@@ -1,0 +1,14 @@
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/Adventure.Net.Modern.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/Adventure.Net.Modern.csproj.CoreCompileInputs.cache
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/Adventure.Net.Modern.sourcelink.json
+/home/runner/work/adventure/adventure/Adventure.Net/bin/Debug/net8.0/advent
+/home/runner/work/adventure/adventure/Adventure.Net/bin/Debug/net8.0/advent.dll.config
+/home/runner/work/adventure/adventure/Adventure.Net/bin/Debug/net8.0/advent.deps.json
+/home/runner/work/adventure/adventure/Adventure.Net/bin/Debug/net8.0/advent.runtimeconfig.json
+/home/runner/work/adventure/adventure/Adventure.Net/bin/Debug/net8.0/advent.dll
+/home/runner/work/adventure/adventure/Adventure.Net/bin/Debug/net8.0/advent.pdb
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/advent.dll
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/refint/advent.dll
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/advent.pdb
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/Adventure.Net.Modern.genruntimeconfig.cache
+/home/runner/work/adventure/adventure/Adventure.Net/obj/Debug/net8.0/ref/advent.dll

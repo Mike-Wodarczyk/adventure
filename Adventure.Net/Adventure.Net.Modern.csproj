@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>advent</AssemblyName>
+    <RootNamespace>Adventure.Net</RootNamespace>
+    <AssemblyTitle>Colossal Cave Adventure</AssemblyTitle>
+    <AssemblyDescription>The classic Colossal Cave Adventure game</AssemblyDescription>
+    <AssemblyVersion>4.2.0.0</AssemblyVersion>
+    <FileVersion>4.2.0.0</FileVersion>
+    <Copyright>Public Domain</Copyright>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+</Project>
