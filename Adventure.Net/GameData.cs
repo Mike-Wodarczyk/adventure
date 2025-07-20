@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using static Adventure.Net.AdventureConstants;
 
 namespace Adventure.Net
 {
@@ -75,6 +77,47 @@ namespace Adventure.Net
         public static bool HasLocationDescription(int locationId)
         {
             return LocationDescriptions.ContainsKey(locationId);
+        }
+
+        /// <summary>
+        /// Print a game message (equivalent to rspeak() in C version)
+        /// </summary>
+        public static void RSpeak(int msg)
+        {
+            Console.Write(GetMessage(msg));
+        }
+
+        /// <summary>
+        /// Print object message with state (equivalent to pspeak() in C version)
+        /// </summary>
+        public static void PSpeak(int item, int state)
+        {
+            // For now, basic implementation - in full version this would look up
+            // object-specific messages with state information
+            Console.WriteLine($"[Object {item} in state {state}]");
+        }
+
+        /// <summary>
+        /// Get object name for printing (equivalent to probj() in C version)
+        /// </summary>
+        public static string GetObjectName(int objectId)
+        {
+            // Basic object names - in full version this would be more comprehensive
+            var objectNames = new Dictionary<int, string>
+            {
+                [KEYS] = "keys", [LAMP] = "lamp", [GRATE] = "grate", [CAGE] = "cage",
+                [ROD] = "rod", [ROD2] = "rod", [BIRD] = "bird", [DOOR] = "door",
+                [SNAKE] = "snake", [BOTTLE] = "bottle", [WATER] = "water", [OIL] = "oil",
+                [FOOD] = "food", [AXE] = "axe", [BEAR] = "bear", [DRAGON] = "dragon",
+                [TROLL] = "troll", [VASE] = "vase", [CHAIN] = "chain", [COINS] = "coins",
+                [CLAM] = "clam", [OYSTER] = "oyster", [PEARL] = "pearl", [PILLOW] = "pillow",
+                [PLANT] = "plant", [DWARF] = "dwarf", [MIRROR] = "mirror", [TABLET] = "tablet"
+            };
+
+            if (objectNames.TryGetValue(objectId, out string name))
+                return name;
+            
+            return $"object{objectId}";
         }
     }
 }
