@@ -43,45 +43,12 @@ namespace Adventure.Net
         }
 
         /// <summary>
-        /// Describe current location (converted from describe() in turn.c)
-        /// </summary>
-        private static void Describe()
-        {
-            // Basic implementation - check if dark, if visited, etc.
-            if (Dark())
-            {
-                RSpeak(16); // "It is now pitch dark. If you proceed you will likely fall into a pit."
-            }
-            else if (gameState.Visited[gameState.Loc] > 0)
-            {
-                // Short description
-                Console.Write(GameData.GetLocationDescription(gameState.Loc));
-            }
-            else
-            {
-                // Long description (first visit)
-                Console.Write(GameData.GetLocationDescription(gameState.Loc));
-                gameState.Visited[gameState.Loc] = 1;
-            }
-        }
-
-        /// <summary>
         /// Describe visible items (converted from descitem() in turn.c)
         /// Basic stub for now
         /// </summary>
         private static void DescribeItems()
         {
             // TODO: Implement item description
-        }
-
-        /// <summary>
-        /// Check if current location is dark (converted from dark() in turn.c)
-        /// </summary>
-        private static bool Dark()
-        {
-            // Basic implementation - location has no light and player has no lamp
-            return (gameState.Cond[gameState.Loc] & LIGHT) == 0 && 
-                   (gameState.Prop[LAMP] == 0 || gameState.Place[LAMP] != gameState.Loc);
         }
 
         /// <summary>
@@ -120,11 +87,46 @@ namespace Adventure.Net
         /// </summary>
         private static void ProcessVerb(int verb, int obj)
         {
+            // Check if this is a transitive verb that should be handled by Verb class
             switch (verb)
             {
+                case TAKE:
+                case DROP:
+                case OPEN:
+                case LOCK:
+                case SAY:
+                case ON:
+                case OFF:
+                case WAVE:
+                case KILL:
+                case POUR:
+                case EAT:
+                case DRINK:
+                case RUB:
+                case THROW:
+                case FEED:
+                case FIND:
+                case FILL:
+                case READ:
+                case BLAST:
+                case BREAK:
+                case WAKE:
+                case CALM:
+                case WALK:
+                case FOO:
+                case BRIEF:
+                case SUSPEND:
+                case HOURS:
+                case LOG:
+                case NOTHING:
+                    // These are transitive verbs handled by Verb class
+                    Verb.ProcessTransitiveVerb();
+                    break;
+                    
+                // Handle intransitive verbs locally for now
                 case QUIT:
                     gameState.SaveFlg = 1;
-                    RSpeak(54); // "ok."
+                    GameData.RSpeak(54); // "ok."
                     break;
                 case LOOK:
                     gameState.Visited[gameState.Loc] = 0; // Force long description
@@ -217,6 +219,77 @@ namespace Adventure.Net
         private static void RSpeak(int msg)
         {
             Console.Write(GameData.GetMessage(msg));
+        }
+
+        // Public methods that can be called by Verb class
+
+        /// <summary>
+        /// Public describe method for use by Verb class
+        /// </summary>
+        public static void Describe()
+        {
+            // Basic implementation - check if dark, if visited, etc.
+            if (gameState.Dark())
+            {
+                GameData.RSpeak(16); // "It is now pitch dark. If you proceed you will likely fall into a pit."
+            }
+            else if (gameState.Visited[gameState.Loc] > 0)
+            {
+                // Short description
+                Console.Write(GameData.GetLocationDescription(gameState.Loc));
+            }
+            else
+            {
+                // Long description (first visit)
+                Console.Write(GameData.GetLocationDescription(gameState.Loc));
+                gameState.Visited[gameState.Loc] = 1;
+            }
+        }
+
+        /// <summary>
+        /// Ask yes/no question (equivalent to yes() in C version)
+        /// </summary>
+        public static bool Yes(int msg1, int msg2, int msg3)
+        {
+            if (msg1 != 0)
+                GameData.RSpeak(msg1);
+            
+            Console.Write("> ");
+            string answer = Console.ReadLine() ?? "";
+            
+            if (string.IsNullOrEmpty(answer))
+                Environment.Exit(0);
+            
+            if (char.ToLower(answer[0]) == 'n')
+            {
+                if (msg3 != 0)
+                    GameData.RSpeak(msg3);
+                return false;
+            }
+            
+            if (msg2 != 0)
+                GameData.RSpeak(msg2);
+            return true;
+        }
+
+        /// <summary>
+        /// Handle dwarf end game (converted from dwarfend() in turn.c)
+        /// </summary>
+        public static void DwarfEnd()
+        {
+            // Basic implementation - end the game
+            Console.WriteLine("The dwarf kills you and eats your corpse!");
+            Environment.Exit(1);
+        }
+
+        /// <summary>
+        /// Handle normal end game (converted from normend() in turn.c)
+        /// </summary>
+        public static void NormEnd()
+        {
+            // Basic implementation - end the game normally
+            Console.WriteLine("The game ends normally.");
+            Environment.Exit(0);
         }
     }
 }

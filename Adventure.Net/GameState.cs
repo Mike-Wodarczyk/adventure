@@ -1,3 +1,4 @@
+using System;
 using static Adventure.Net.AdventureConstants;
 
 namespace Adventure.Net
@@ -135,6 +136,107 @@ namespace Adventure.Net
 
             for (int i = 0; i < ODLoc.Length; i++)
                 ODLoc[i] = 0;
+        }
+
+        // Helper methods for game logic (equivalent to C functions)
+
+        /// <summary>
+        /// Check if player is carrying an object (equivalent to toting() in C)
+        /// </summary>
+        public bool Toting(int item) => Place[item] == -1;
+
+        /// <summary>
+        /// Check if object is at current location (equivalent to here() in C)
+        /// </summary>
+        public bool Here(int item) => Place[item] == Loc || Toting(item);
+
+        /// <summary>
+        /// Check if object is at specified location (equivalent to at() in C)
+        /// </summary>
+        public bool At(int item) => Place[item] == Loc || Fixed[item] == Loc;
+
+        /// <summary>
+        /// Check if it's dark (equivalent to dark() in C)
+        /// </summary>
+        public bool Dark() => (Cond[Loc] & LIGHT) == 0 && (Prop[LAMP] == 0 || !Here(LAMP));
+
+        /// <summary>
+        /// Get liquid in bottle (equivalent to liq() in C)
+        /// </summary>
+        public int Liq() => Prop[BOTTLE] == 1 ? WATER : (Prop[BOTTLE] == 2 ? OIL : 0);
+
+        /// <summary>
+        /// Get liquid at location (equivalent to liqloc() in C)
+        /// </summary>
+        public int LiqLoc(int loc) => (Cond[loc] & LIQUID) != 0 ? (Cond[loc] & WATOIL) != 0 ? OIL : WATER : 0;
+
+        /// <summary>
+        /// Move object to location (equivalent to move() in C)
+        /// </summary>
+        public void Move(int obj, int where) => Place[obj] = where;
+
+        /// <summary>
+        /// Destroy object (equivalent to dstroy() in C)
+        /// </summary>
+        public void Destroy(int obj) => Move(obj, 0);
+
+        /// <summary>
+        /// Carry object (equivalent to carry() in C)
+        /// </summary>
+        public void Carry(int obj, int where)
+        {
+            if (obj <= MAXOBJ)
+            {
+                if (Place[obj] == -1)
+                    Holding--;
+                Place[obj] = -1;
+                Holding++;
+            }
+        }
+
+        /// <summary>
+        /// Drop object at location (equivalent to drop() in C)
+        /// </summary>
+        public void Drop(int obj, int where)
+        {
+            if (obj <= MAXOBJ)
+            {
+                if (Place[obj] == -1)
+                    Holding--;
+                Place[obj] = where;
+            }
+        }
+
+        /// <summary>
+        /// Check for dwarf (equivalent to dcheck() in C)
+        /// Returns dwarf number if present, 0 if not
+        /// </summary>
+        public int DCheck()
+        {
+            for (int i = 1; i < DWARFMAX; i++)
+                if (DLoc[i] == Loc)
+                    return i;
+            return 0;
+        }
+
+        /// <summary>
+        /// Random percentage check (equivalent to pct() in C)
+        /// </summary>
+        public bool Pct(int percent, Random random) => random.Next(100) < percent;
+
+        /// <summary>
+        /// Juggle an object (equivalent to juggle() in C)
+        /// </summary>
+        public void Juggle(int loc)
+        {
+            for (int i = 1; i <= MAXOBJ; i++)
+            {
+                if (Place[i] == loc)
+                {
+                    Move(i, 1);
+                    break;
+                }
+            }
         }
     }
 }

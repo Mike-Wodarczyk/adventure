@@ -46,6 +46,9 @@ namespace Adventure.Net
             // Initialize Turn processor
             Net.Turn.Initialize(gameState);
             
+            // Initialize Verb processor
+            Verb.Initialize(gameState, random);
+            
             if (rflag)
                 Restore();
             else if (Yes(65, 1, 0))
