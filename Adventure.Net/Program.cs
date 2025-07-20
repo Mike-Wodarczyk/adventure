@@ -43,6 +43,9 @@ namespace Adventure.Net
             OpenTxt();
             InitPlay();
             
+            // Initialize Turn processor
+            Net.Turn.Initialize(gameState);
+            
             if (rflag)
                 Restore();
             else if (Yes(65, 1, 0))
@@ -324,10 +327,64 @@ namespace Adventure.Net
             return Path.Combine(home, ".adventure");
         }
 
-        // Placeholder methods - these will be implemented in other classes
-        private static bool Yes(int msg, int x, int y) { return false; } // Temporary stub
-        private static void Turn() { } // Temporary stub
-        private static void Bug(int num) { Environment.Exit(1); } // Temporary stub
-        private static void Describe() { } // Temporary stub
+        /// <summary>
+        /// Ask yes/no question with messages (converted from yes() in database.c)
+        /// </summary>
+        private static bool Yes(int msg1, int msg2, int msg3)
+        {
+            if (msg1 != 0)
+                RSpeak(msg1);
+            
+            Console.Write("> ");
+            string answer = Console.ReadLine();
+            
+            if (string.IsNullOrEmpty(answer))
+                Environment.Exit(0);
+            
+            if (char.ToLower(answer[0]) == 'n')
+            {
+                if (msg3 != 0)
+                    RSpeak(msg3);
+                return false;
+            }
+            
+            if (msg2 != 0)
+                RSpeak(msg2);
+            return true;
+        }
+
+        /// <summary>
+        /// Print a game message (converted from rspeak() in database.c)
+        /// </summary>
+        private static void RSpeak(int msg)
+        {
+            Console.Write(GameData.GetMessage(msg));
+        }
+
+        /// <summary>
+        /// Handle fatal errors (converted from bug() in database.c)
+        /// </summary>
+        private static void Bug(int num)
+        {
+            Console.WriteLine($"Fatal error {num} - terminating game");
+            Environment.Exit(1);
+        }
+
+        /// <summary>
+        /// Describe current location (converted from describe() in turn.c)
+        /// Basic version for now
+        /// </summary>
+        private static void Describe()
+        {
+            Console.Write(GameData.GetLocationDescription(gameState.Loc));
+        }
+
+        /// <summary>
+        /// Main game turn processor
+        /// </summary>
+        private static void Turn()
+        {
+            Net.Turn.ProcessTurn();
+        }
     }
 }
