@@ -954,50 +954,46 @@ namespace Adventure.Net
             Console.WriteLine($"{(wtype == 2 ? gameState.Word1 : gameState.Word2)} what?");
         }
 
-        // Helper method stubs that need to be implemented or reference external classes
+        // Helper method calls to other classes
 
         /// <summary>
-        /// Analyze word for type and value (would call English.Analyze)
+        /// Analyze word for type and value (calls English.Analyze)
         /// </summary>
         private static void Analyze(string word, out int type, out int value)
         {
-            // This would call the actual analyze function from English.cs
-            // For now, simplified implementation
-            type = 0;
-            value = 0;
+            English.Analyze(word, out type, out value);
         }
 
         /// <summary>
-        /// Ask yes/no question
+        /// Ask yes/no question (calls Turn.Yes)
         /// </summary>
         private static bool Yes(int msg1, int msg2, int msg3)
         {
-            // This would call the actual yes function - probably in Turn.cs or Program.cs
-            return true; // Simplified for now
+            return Turn.Yes(msg1, msg2, msg3);
         }
 
         /// <summary>
-        /// Describe current location
+        /// Describe current location (calls Turn.Describe)
         /// </summary>
         private static void Describe()
         {
-            // This would call the actual describe function from Turn.cs
+            Turn.Describe();
         }
 
         /// <summary>
-        /// Handle dwarf end game
+        /// Handle dwarf end game (calls Turn.DwarfEnd)
         /// </summary>
         private static void DwarfEnd()
         {
-            // This would call the actual dwarfend function from Turn.cs
+            Turn.DwarfEnd();
         }
 
         /// <summary>
-        /// Handle normal end game
+        /// Handle normal end game (calls Turn.NormEnd)
         /// </summary>
         private static void NormEnd()
         {
-            // This would call the actual normend function from Turn.cs
+            Turn.NormEnd();
         }
 
         /// <summary>

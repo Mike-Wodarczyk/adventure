@@ -183,7 +183,7 @@ namespace Adventure.Net
         /// <summary>
         /// Analyze a word and determine its type and value (converted from analyze() in english.c)
         /// </summary>
-        private static bool Analyze(string word, out int type, out int value)
+        public static bool Analyze(string word, out int type, out int value)
         {
             type = -1;
             value = -1;
